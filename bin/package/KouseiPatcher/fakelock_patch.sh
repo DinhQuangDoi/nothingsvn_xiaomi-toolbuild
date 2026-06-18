@@ -52,7 +52,7 @@ else
 fi
 
 cat $prop/build.prop >> $work_dir/build/baserom/images/system/system/build.prop
-if [[ $sdkLevel -lt "32" ]];then
+if [[ $androidVER == "12" ]]; then
 cat $prop/cust.prop >> $work_dir/build/baserom/images/system/system/etc/cust/cust_prop_white_keys_list
 else
 cat $prop/cust.prop >> $work_dir/build/baserom/images/system_ext/etc/cust_prop_white_keys_list
