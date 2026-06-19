@@ -7,6 +7,7 @@ androidVER=$(cat $work_dir/bin/ddevice/androidver.txt)
 APKEDITOR="java -jar $work_dir/bin/apktool/apke.jar"
 repS="python3 $work_dir/bin/strRep.py"
 
+if [[ $regionTYPE == "China" ]]; then
 mods "Patching Enhanched Keyboard"
 #ready for patch
 MIUIFrequentPhraseDIR=$(find "$MAIN_FOLDER" -type d -name "MIUIFrequentPhrase" | head -n 1)
@@ -35,3 +36,4 @@ else
     mods "MIUIFrequentPhrase.apk not found, skipping patch"
 fi
 mods "Done"
+fi

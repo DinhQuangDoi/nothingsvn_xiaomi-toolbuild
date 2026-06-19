@@ -1011,33 +1011,12 @@ $decompile_dir/smali*/com/android/server/wm/ActivityTaskSupervisorImpl.smali
 $decompile_dir/smali*/com/android/server/wm/MiuiSplitInputMethodImpl.smali
 $decompile_dir/smali*/com/miui/server/security/AppBehaviorService.smali
 "
-  for i in $class; do
-    [ -f "$i" ] || continue
-    sed -i 's/com.baidu.input_mi/com.google.android.inputmethod.latin/g' "$i"
-  done
   for i in $decompile_dir/smali*/com/android/server/am/ProcessPolicy.smali; do
     replace_line_contains_in_smali_method "IS_INTERNATIONAL_BUILD" "updateContentCatcherWhitelist()V" "    const/4 v0, 0x0" $i
   done
   for i in $decompile_dir/smali*/com/android/server/am/ActivityManagerServiceImpl.smali; do
     [ -f "$i" ] || continue
     sed -i '/Lmiui\/drm\/DrmBroadcast;->getInstance/{N;N;N;N;d}' "$i"
-  done
-}
-
-# Apply Global Patch
-apply_miui_framework_global_patch() {
-  local decompile_dir="$1"
-  cp -rf "$home/addons/miui-framework/smali/miui" "$decompile_dir/smali"
-  ls "$decompile_dir/smali/miui"
-  local class="
-$decompile_dir/smali*/android/inputmethodservice/InputMethodServiceInjector.smali
-$decompile_dir/smali*/android/view/inputmethod/InputMethodManagerStubImpl.smali
-$decompile_dir/smali*/com/android/internal/os/AnrEnhanceImpl.smali
-"
-  for i in $class; do
-    [ -f "$i" ] || continue
-    sed -i 's/com.baidu.input_mi/com.google.android.inputmethod.latin/g' "$i"
-    echo "Patched Gboard"
   done
 }
 
@@ -1073,13 +1052,13 @@ patch_miui_services() {
 
   # Apply feature-specific patches based on flags
   apply_miui_services_signature_patches "$decompile_dir"
-  apply_miui_services_gboard "$decompile_dir"
   apply_miui_services_floating "$decompile_dir"
   apply_miui_services_contentextension "$decompile_dir"
   if [[ $regionTYPE == *"Global"* ]];then
     apply_miui_services_global_patch "$decompile_dir"
   else
     apply_miui_services_cn_notification_fix "$decompile_dir"
+    apply_miui_services_gboard "$decompile_dir"
   fi
 
   # Modify invoke-custom methods (common to all features)
@@ -1131,12 +1110,7 @@ patch_miui_framework() {
 
   # Modify invoke-custom methods (common to all features)
   modify_invoke_custom_methods "$decompile_dir"
-  
-  if [[ $regionTYPE == *"Global"* ]];then
-    apply_miui_framework_global_patch "$decompile_dir"
-  else
-    apply_miui_framework_cn_notification_fix "$decompile_dir"
-  fi
+  apply_miui_framework_cn_notification_fix "$decompile_dir"
 
   # Recompile miui-framework.jar
   recompile_jar "$miui_framework_path"
